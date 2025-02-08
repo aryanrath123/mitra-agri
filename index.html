@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kisan Mitra</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <h1>Get All Your Questions Answered Here</h1>
+</header>
+    <div class="chat-container">
+        <div class="ai-chat-box">
+            <img src="ai.png.webp" alt="AI Assistant" id="aiImage" width="10%" />
+            <div class="ai-chat-area">
+                Hello! How can I help you today?
+            </div>
+        </div>
+    </div>
+    <div class="prompt-area">
+        <input type="text" id="prompt" placeholder="Message..." />
+        <button id="image" aria-label="Attach Image">
+            <img src="img.svg" alt="Attach Image" />
+        </button>
+        <input type="file" id="imageInput" accept="image/*" hidden />
+        <button id="submit" aria-label="Send Message">
+            <img src="submit.svg" alt="Send Message" />
+        </button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
