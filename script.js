@@ -8,7 +8,7 @@ const Api_Url =
   "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
 
 // 🔑 Replace with your actual Gemini API key
-const API_KEY = "AIzaSyCE8P1EcYXHgcRe51u-XOrv-7hsNLNNFa4";
+const API_KEY = "AIzaSyAwkSUMKPwpoHXtzproUK7K7InNNXz9y70";
 
 let user = {
   message: null,
@@ -166,4 +166,5 @@ imageInput.addEventListener("change", () => {
 imageBtn.addEventListener("click", () => {
   imageInput.click();
 });
+
 
