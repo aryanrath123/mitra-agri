@@ -6,6 +6,8 @@ let imageInput = document.querySelector("#imageInput");
 
 const Api_Url =
   "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
+
+// 🔑 Replace with your actual Gemini API key
 const API_KEY = "AIzaSyAPf1sLp10uYiI_YdUvwO2UnMbXfl6KrnY";
 
 let user = {
@@ -30,25 +32,28 @@ async function generateResponse(aiChatBox) {
     ],
   };
 
-  let requestOptions = {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-goog-api-key": API_KEY,
-    },
-    body: JSON.stringify(requestBody),
-  };
-
   try {
-    let response = await fetch(Api_Url, requestOptions);
+    // Disable inputs while waiting
+    prompt.disabled = true;
+    submitBtn.disabled = true;
+    imageBtn.disabled = true;
 
-    // Handle too many requests (429)
+    let response = await fetch(Api_Url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-goog-api-key": API_KEY,
+      },
+      body: JSON.stringify(requestBody),
+    });
+
+    // Explicitly handle rate limit
     if (response.status === 429) {
-      text.innerHTML = "⚠️ Rate limit reached. Please wait and try again.";
+      text.innerHTML = "⚠️ Too many requests. Please wait and try again.";
       return;
     }
 
-    // Handle other errors
+    // Handle any other non-OK errors
     if (!response.ok) {
       text.innerHTML = `❌ Error ${response.status}: ${response.statusText}`;
       return;
@@ -62,18 +67,23 @@ async function generateResponse(aiChatBox) {
         .trim();
       text.innerHTML = apiResponse;
     } else {
-      console.error("Unexpected API response:", data);
-      text.innerHTML = "⚠️ No valid response from AI.";
+      console.error("Unexpected response:", data);
+      text.innerHTML = "❌ API did not return a valid response.";
     }
   } catch (error) {
     console.error("Error:", error);
     text.innerHTML = "❌ Something went wrong. Please try again.";
   } finally {
+    // Re-enable inputs
+    prompt.disabled = false;
+    submitBtn.disabled = false;
+    imageBtn.disabled = false;
+
     chatContainer.scrollTo({
       top: chatContainer.scrollHeight,
       behavior: "smooth",
     });
-    user.file = { mime_type: null, data: null }; // Reset file data
+    user.file = { mime_type: null, data: null }; // Reset file
   }
 }
 
