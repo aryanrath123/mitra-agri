@@ -5,7 +5,8 @@ let imageBtn = document.querySelector("#image");
 let imageInput = document.querySelector("#imageInput");
 
 const Api_Url =
-  "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyAPf1sLp10uYiI_YdUvwO2UnMbXfl6KrnY";
+  "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
+const API_KEY = "AIzaSyAPf1sLp10uYiI_YdUvwO2UnMbXfl6KrnY";
 
 let user = {
   message: null,
@@ -31,20 +32,42 @@ async function generateResponse(aiChatBox) {
 
   let requestOptions = {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "X-goog-api-key": API_KEY,
+    },
     body: JSON.stringify(requestBody),
   };
 
   try {
     let response = await fetch(Api_Url, requestOptions);
+
+    // Handle too many requests (429)
+    if (response.status === 429) {
+      text.innerHTML = "⚠️ Rate limit reached. Please wait and try again.";
+      return;
+    }
+
+    // Handle other errors
+    if (!response.ok) {
+      text.innerHTML = `❌ Error ${response.status}: ${response.statusText}`;
+      return;
+    }
+
     let data = await response.json();
-    let apiResponse = data.candidates[0].content.parts[0].text
-      .replace(/\*\*(.*?)\*\*/g, "$1")
-      .trim();
-    text.innerHTML = apiResponse;
+
+    if (data.candidates && data.candidates.length > 0) {
+      let apiResponse = data.candidates[0].content.parts[0].text
+        .replace(/\*\*(.*?)\*\*/g, "$1")
+        .trim();
+      text.innerHTML = apiResponse;
+    } else {
+      console.error("Unexpected API response:", data);
+      text.innerHTML = "⚠️ No valid response from AI.";
+    }
   } catch (error) {
     console.error("Error:", error);
-    text.innerHTML = "Sorry, something went wrong. Please try again.";
+    text.innerHTML = "❌ Something went wrong. Please try again.";
   } finally {
     chatContainer.scrollTo({
       top: chatContainer.scrollHeight,
@@ -95,7 +118,7 @@ function handleChatResponse(usermessage) {
 }
 
 prompt.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") {
+  if (e.key === "Enter" && prompt.value.trim() !== "") {
     handleChatResponse(prompt.value);
   }
 });
@@ -125,12 +148,11 @@ imageInput.addEventListener("change", () => {
     };
 
     // Display the image in the chat area immediately
-    handleChatResponse("Image uploaded:");
+    handleChatResponse("📷 Image uploaded:");
   };
   reader.readAsDataURL(file);
 });
 
 imageBtn.addEventListener("click", () => {
   imageInput.click();
-
 });
